@@ -26,10 +26,12 @@
     "db:studio": "prisma studio"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
+    "pg": "^8.22.0",
     "prettier": "^3.3.0",
     "prisma": "^6.0.0",
     "typescript": "^5.6.0",

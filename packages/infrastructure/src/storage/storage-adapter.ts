@@ -48,7 +48,7 @@ export class StorageAdapter implements IMediaStorage {
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
     const result = await this._client.storage
       .from(this._bucket)
-      .getSignedUrl(key, expiresIn);
+      .createSignedUrl(key, expiresIn);
 
     if ((result as any).error) {
       throw new Error(`Get signed URL failed: ${(result as any).error.message}`);

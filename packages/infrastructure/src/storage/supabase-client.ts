@@ -1,34 +1,49 @@
+import { createClient, SupabaseClient as SupabaseJSClient } from '@supabase/supabase-js';
+
 export interface SupabaseConfig {
   url: string;
   anonKey: string;
   serviceRoleKey?: string;
 }
 
-export function createSupabaseClient(_config: SupabaseConfig) {
-  // Dynamic import to avoid hard dependency
-  // In production: import { createClient } from '@supabase/supabase-js';
-  // For now, return a typed interface that matches Supabase client API
-  return {
-    storage: {
-      from: (_bucket: string) => ({
-        upload: async (_path: string, _file: Buffer, _options?: { contentType?: string }) => {
-          throw new Error('Supabase client not configured. Install @supabase/supabase-js.');
-        },
-        download: async (_path: string) => {
-          throw new Error('Supabase client not configured. Install @supabase/supabase-js.');
-        },
-        remove: async (_paths: string[]) => {
-          throw new Error('Supabase client not configured. Install @supabase/supabase-js.');
-        },
-        getSignedUrl: async (_path: string, _expiresIn?: number) => {
-          throw new Error('Supabase client not configured. Install @supabase/supabase-js.');
-        },
-        list: async (_prefix?: string) => {
-          throw new Error('Supabase client not configured. Install @supabase/supabase-js.');
-        },
-      }),
-    },
-  };
+let supabaseInstance: SupabaseJSClient | null = null;
+let supabaseAdminInstance: SupabaseJSClient | null = null;
+
+export function createSupabaseClient(config: SupabaseConfig): SupabaseJSClient {
+  return createClient(config.url, config.anonKey);
 }
 
-export type SupabaseClient = ReturnType<typeof createSupabaseClient>;
+export function createSupabaseAdminClient(config: SupabaseConfig): SupabaseJSClient {
+  if (!config.serviceRoleKey) {
+    throw new Error('Supabase service role key is required for admin client');
+  }
+  return createClient(config.url, config.serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
+export function getSupabaseClient(): SupabaseJSClient {
+  if (!supabaseInstance) {
+    supabaseInstance = createSupabaseClient({
+      url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    });
+  }
+  return supabaseInstance;
+}
+
+export function getSupabaseAdminClient(): SupabaseJSClient {
+  if (!supabaseAdminInstance) {
+    supabaseAdminInstance = createSupabaseAdminClient({
+      url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    });
+  }
+  return supabaseAdminInstance;
+}
+
+export type SupabaseClient = SupabaseJSClient;
