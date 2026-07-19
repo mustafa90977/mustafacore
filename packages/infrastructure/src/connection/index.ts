@@ -59,3 +59,8 @@ export {
   ConnectionManager,
   ConnectionManagerConfig,
 } from './connection-manager';
+
+export {
+  ConnectionOrchestrator,
+  ConnectionOrchestratorConfig,
+} from './connection-orchestrator';

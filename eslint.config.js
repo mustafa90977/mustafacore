@@ -14,6 +14,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["**/node_modules/**", "**/dist/**", "**/build/**", "**/.next/**"],
+    ignores: ["**/node_modules/**", "**/dist/**", "**/build/**", "**/.next/**", "packages/*/src/**/*.js", "packages/*/src/**/*.d.ts", "packages/*/src/**/*.js.map", "packages/*/src/**/*.d.ts.map"],
   }
 );

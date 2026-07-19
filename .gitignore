@@ -8,6 +8,12 @@ build/
 .next/
 out/
 
+# Generated artifacts (tsc --build emits alongside .ts in packages)
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts.map
+
 # TypeScript
 *.tsbuildinfo
 
