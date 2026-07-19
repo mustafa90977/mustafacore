@@ -17,7 +17,8 @@
       "@/*": ["./src/*"],
       "@wacore/shared": ["../../packages/shared/src"],
       "@wacore/wa-core": ["../../packages/wa-core/src"],
-      "@wacore/commerce-core": ["../../packages/commerce-core/src"]
+      "@wacore/commerce-core": ["../../packages/commerce-core/src"],
+      "@wacore/infrastructure": ["../../packages/infrastructure/src"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "next-env.d.ts"],
@@ -31,6 +32,9 @@
     },
     {
       "path": "../../packages/commerce-core"
+    },
+    {
+      "path": "../../packages/infrastructure"
     }
   ]
 }
