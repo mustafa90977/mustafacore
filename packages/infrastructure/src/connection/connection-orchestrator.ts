@@ -1,10 +1,11 @@
 import { UniqueId, ILogger } from '@wacore/shared';
-import { ConnectionStatus } from '@wacore/wa-core';
+import { ConnectionStatus, IncomingMessage } from '@wacore/wa-core';
 import { InstanceStatus, SessionStatus } from '@prisma/client';
 import { BaileysProvider } from '../baileys/baileys-provider';
 import { SessionManager, SessionManagerConfig } from '../session/session-manager';
 import { IInstanceRepository } from '../repositories/instance.repository';
 import { ISessionRepository } from '../repositories/session.repository';
+import { InboundMessageOrchestrator } from '../messaging/inbound-message-orchestrator';
 
 export interface ConnectionOrchestratorConfig {
   sessionConfig: SessionManagerConfig;
@@ -15,6 +16,7 @@ export class ConnectionOrchestrator {
   private readonly _sessionManager: SessionManager;
   private readonly _instanceRepo: IInstanceRepository;
   private readonly _sessionRepo: ISessionRepository;
+  private readonly _messageOrchestrator: InboundMessageOrchestrator;
   private readonly _providers: Map<UniqueId, BaileysProvider> = new Map();
 
   constructor(
@@ -22,11 +24,13 @@ export class ConnectionOrchestrator {
     config: ConnectionOrchestratorConfig,
     instanceRepo: IInstanceRepository,
     sessionRepo: ISessionRepository,
+    messageOrchestrator: InboundMessageOrchestrator,
   ) {
     this._logger = logger.child({ module: 'ConnectionOrchestrator' });
     this._sessionManager = new SessionManager(logger, config.sessionConfig);
     this._instanceRepo = instanceRepo;
     this._sessionRepo = sessionRepo;
+    this._messageOrchestrator = messageOrchestrator;
   }
 
   async startConnection(instanceId: UniqueId): Promise<{ success: boolean; status: string }> {
@@ -95,6 +99,14 @@ export class ConnectionOrchestrator {
         this._logger.info('Auth state saved after credentials update', { instanceId });
       } catch (error) {
         this._logger.error('Failed to save auth state', error as Error, { instanceId });
+      }
+    });
+
+    provider.on('message_received', async (data: { instanceId: string; message: IncomingMessage }) => {
+      try {
+        await this._messageOrchestrator.handleIncomingMessage(data.message);
+      } catch (error) {
+        this._logger.error('Failed to process incoming message', error as Error, { instanceId });
       }
     });
 

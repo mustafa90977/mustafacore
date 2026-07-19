@@ -36,3 +36,7 @@ export {
   MessageRepositoryIntegrationConfig,
   IMessagePersistenceAdapter,
 } from './message-repository-integration';
+
+export {
+  InboundMessageOrchestrator,
+} from './inbound-message-orchestrator';
