@@ -1,0 +1,9 @@
+export type Email = string;
+export type PhoneNumber = string;
+export type Url = string;
+export type IsoDate = string;
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonObject = { [key: string]: JsonValue };
+export type Timestamp = Date;
+export type CurrencyCode = string;
+export type IsoCountryCode = string;

@@ -1,0 +1,9 @@
+export enum SessionStatus {
+  INACTIVE = 'INACTIVE',
+  QR_PENDING = 'QR_PENDING',
+  QR_SCANNED = 'QR_SCANNED',
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  REVOKED = 'REVOKED',
+  FAILED = 'FAILED',
+}

@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "paths": {
+      "@wacore/shared": ["../shared/src"],
+      "@wacore/wa-core": ["../wa-core/src"],
+      "@prisma/client": ["../../node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3/node_modules/@prisma/client"]
+    }
+  },
+  "include": ["src/**/*.ts", "../shared/src/**/*.ts", "../wa-core/src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

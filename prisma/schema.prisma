@@ -1,0 +1,427 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Shared Models
+// ============================================================================
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  plan      Plan     @default(FREE)
+  settings  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stores     Store[]
+  customers  Customer[]
+  instances  WhatsAppInstance[]
+  events     Event[]
+
+  @@map("workspaces")
+}
+
+model Event {
+  id            String   @id @default(uuid())
+  eventType     String
+  aggregateType String
+  aggregateId   String
+  workspaceId   String
+  source        EventSource
+  payload       Json
+  metadata      Json?
+  processedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([aggregateType, aggregateId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("events")
+}
+
+// ============================================================================
+// WA Core Models
+// ============================================================================
+
+model WhatsAppInstance {
+  id                  String         @id @default(uuid())
+  workspaceId         String
+  storeId             String?
+  name                String
+  phoneNumber         String
+  provider            ProviderType
+  status              InstanceStatus @default(DISCONNECTED)
+  authState           Json?
+  lastConnectedAt     DateTime?
+  lastDisconnectedAt  DateTime?
+  errorCount          Int            @default(0)
+  maxErrors           Int            @default(10)
+  lastError           String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  store     Store?    @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  sessions  WhatsAppSession[]
+  messages  Message[]
+  conversations Conversation[]
+
+  @@unique([workspaceId, phoneNumber])
+  @@index([workspaceId])
+  @@index([storeId])
+  @@index([status])
+  @@map("whatsapp_instances")
+}
+
+model WhatsAppSession {
+  id              String        @id @default(uuid())
+  instanceId      String
+  sessionId       String
+  status          SessionStatus @default(QR_PENDING)
+  qrCode          String?
+  qrGeneratedAt   DateTime?
+  qrExpiresAt     DateTime?
+  authData        Json?
+  isActive        Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  instance WhatsAppInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId])
+  @@index([status])
+  @@index([isActive])
+  @@map("whatsapp_sessions")
+}
+
+model Message {
+  id              String          @id @default(uuid())
+  instanceId      String
+  externalId      String?
+  conversationId  String?
+  direction       MessageDirection
+  type            MessageType
+  content         Json
+  mediaUrl        String?
+  mimeType        String?
+  status          MessageStatus   @default(PENDING)
+  error           String?
+  retryCount      Int             @default(0)
+  maxRetries      Int             @default(3)
+  quotedMessageId String?
+  timestamp       DateTime
+  metadata        Json?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  instance     WhatsAppInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  conversation Conversation?    @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@unique([instanceId, externalId])
+  @@index([instanceId])
+  @@index([conversationId])
+  @@index([status])
+  @@index([direction])
+  @@index([timestamp])
+  @@map("messages")
+}
+
+// ============================================================================
+// Commerce Core Models
+// ============================================================================
+
+model Store {
+  id          String   @id @default(uuid())
+  workspaceId String
+  name        String
+  description String?
+  phoneNumber String
+  catalogUrl  String?
+  currency    String   @default("USD")
+  isActive    Boolean  @default(true)
+  settings    Json?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace      Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  products       Product[]
+  orders         Order[]
+  customers      Customer[]
+  conversations  Conversation[]
+  instances      WhatsAppInstance[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+  @@index([phoneNumber])
+  @@map("stores")
+}
+
+model Customer {
+  id                String   @id @default(uuid())
+  workspaceId       String
+  phoneNumber       String
+  name              String?
+  pushName          String?
+  profilePictureUrl String?
+  isBusiness        Boolean  @default(false)
+  businessName      String?
+  tags              String[]
+  notes             String?
+  totalOrders       Int      @default(0)
+  totalSpent        Decimal  @default(0) @db.Decimal(10, 2)
+  lastInteractionAt DateTime?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  store         Store?         @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  storeId       String?
+  conversations Conversation[]
+  orders        Order[]
+
+  @@unique([workspaceId, phoneNumber])
+  @@index([workspaceId])
+  @@index([storeId])
+  @@index([phoneNumber])
+  @@map("customers")
+}
+
+model Product {
+  id                String   @id @default(uuid())
+  storeId           String
+  externalId        String?
+  name              String
+  description       String?
+  sku               String?
+  price             Decimal  @db.Decimal(10, 2)
+  compareAtPrice    Decimal? @db.Decimal(10, 2)
+  costPrice         Decimal? @db.Decimal(10, 2)
+  currency          String   @default("USD")
+  inventoryQuantity Int      @default(0)
+  trackInventory    Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  media             Json?
+  attributes        Json?
+  tags              String[]
+  weight            Decimal? @db.Decimal(8, 2)
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  store      Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@unique([storeId, sku])
+  @@index([storeId])
+  @@index([isActive])
+  @@map("products")
+}
+
+model Order {
+  id                String            @id @default(uuid())
+  storeId           String
+  customerId        String
+  conversationId    String?
+  orderNumber       String
+  status            OrderStatus       @default(PENDING)
+  paymentStatus     PaymentStatus     @default(PENDING)
+  fulfillmentStatus FulfillmentStatus @default(UNFULFILLED)
+  subtotal          Decimal           @db.Decimal(10, 2)
+  tax               Decimal           @default(0) @db.Decimal(10, 2)
+  shipping          Decimal           @default(0) @db.Decimal(10, 2)
+  discount          Decimal           @default(0) @db.Decimal(10, 2)
+  total             Decimal           @db.Decimal(10, 2)
+  currency          String            @default("USD")
+  shippingAddress   Json?
+  billingAddress    Json?
+  notes             String?
+  metadata          Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  items        OrderItem[]
+
+  @@unique([storeId, orderNumber])
+  @@index([storeId])
+  @@index([customerId])
+  @@index([conversationId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  productId   String
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  total       Decimal  @db.Decimal(10, 2)
+  productName String
+  productSku  String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Conversation {
+  id                 String               @id @default(uuid())
+  instanceId         String
+  customerId         String
+  storeId            String
+  status             ConversationStatus   @default(ACTIVE)
+  priority           ConversationPriority @default(NORMAL)
+  assigneeId         String?
+  tags               String[]
+  lastMessageAt      DateTime?
+  lastMessagePreview String?
+  unreadCount        Int                  @default(0)
+  metadata           Json?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  instance WhatsAppInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  customer Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store    Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  messages Message[]
+  orders   Order[]
+
+  @@unique([instanceId, customerId])
+  @@index([instanceId])
+  @@index([customerId])
+  @@index([storeId])
+  @@index([status])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum EventSource {
+  WA_CORE
+  COMMERCE_CORE
+}
+
+enum ProviderType {
+  BAILEYS
+  META
+  TWILIO
+  EVOLUTION
+  GREEN
+  DIALOG360
+}
+
+enum InstanceStatus {
+  DISCONNECTED
+  CONNECTING
+  QR_PENDING
+  CONNECTED
+  ERROR
+  DISABLED
+}
+
+enum SessionStatus {
+  INACTIVE
+  QR_PENDING
+  QR_SCANNED
+  ACTIVE
+  EXPIRED
+  REVOKED
+  FAILED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+  LOCATION
+  CONTACT
+}
+
+enum MessageStatus {
+  PENDING
+  SENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum ConversationStatus {
+  ACTIVE
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+enum ConversationPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  REFUNDED
+  FAILED
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
+  PARTIALLY_FULFILLED
+  FULFILLED
+  DELIVERED
+}

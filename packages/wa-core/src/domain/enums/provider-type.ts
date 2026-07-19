@@ -1,0 +1,8 @@
+export enum ProviderType {
+  BAILEYS = 'BAILEYS',
+  META = 'META',
+  TWILIO = 'TWILIO',
+  EVOLUTION = 'EVOLUTION',
+  GREEN = 'GREEN',
+  DIALOG360 = 'DIALOG360',
+}

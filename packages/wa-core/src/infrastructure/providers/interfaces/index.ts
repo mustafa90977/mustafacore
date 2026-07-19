@@ -1,0 +1,12 @@
+export { IProvider, ConnectionOptions, ConnectionResult, QRCodeResult, SendMessageOptions, SendMessageResult, MessageContent, AuthState, PresenceType, MediaType } from './i-provider';
+export { IConnection, ConnectionInfo } from './i-connection';
+export { ISessionStore, SessionData } from './i-session-store';
+export { IMessageSender, SentMessage } from './i-message-sender';
+export { IMessageReceiver } from './i-message-receiver';
+export { IQrProvider, QrCodeData } from './i-qr-provider';
+export { IWebhookPublisher, IncomingMessage, MessageStatusUpdate, IncomingMessageHandler } from './i-webhook-publisher';
+export { IProviderFactory } from './i-provider-factory';
+export { ProviderCapabilities, ProviderFeatures, ProviderLimits, RateLimit } from './provider-capabilities';
+export { IProviderRegistry } from './i-provider-registry';
+export { ProviderHealth } from './provider-health';
+export { ProviderMetrics, IProviderMetricsCollector } from './provider-metrics';

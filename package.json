@@ -1,0 +1,46 @@
+{
+  "name": "wacore",
+  "version": "0.0.1",
+  "private": true,
+  "description": "WhatsApp Commerce Operating System",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "build:shared": "pnpm --filter @wacore/shared build",
+    "build:wa-core": "pnpm --filter @wacore/wa-core build",
+    "build:commerce-core": "pnpm --filter @wacore/commerce-core build",
+    "build:dashboard": "pnpm --filter @wacore/dashboard build",
+    "dev": "pnpm --filter @wacore/dashboard dev",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.3.0",
+    "prisma": "^6.0.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.64.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "dependencies": {
+    "@prisma/client": "6.19.3"
+  }
+}
