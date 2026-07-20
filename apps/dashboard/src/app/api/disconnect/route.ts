@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'instanceId is required' }, { status: 400 });
     }
 
-    const orchestrator = getOrchestrator();
+    const orchestrator = await getOrchestrator();
     await orchestrator.stopConnection(instanceId);
 
     return NextResponse.json({ success: true });

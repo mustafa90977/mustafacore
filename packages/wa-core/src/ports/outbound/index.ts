@@ -1,1 +1,1 @@
-export { IOutboundMessageSender, ISendMessageCommand, ISendMessageResult } from './i-message-sender';
+export type { IOutboundMessageSender, ISendMessageCommand, ISendMessageResult } from './i-message-sender';

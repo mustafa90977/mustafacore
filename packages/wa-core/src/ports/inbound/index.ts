@@ -1,1 +1,1 @@
-export { IMessageHandler, IConnectionHandler } from './i-message-handler';
+export type { IMessageHandler, IConnectionHandler } from './i-message-handler';

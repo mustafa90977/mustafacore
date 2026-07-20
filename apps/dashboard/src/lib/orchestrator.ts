@@ -7,12 +7,17 @@ import {
   CustomerRepository,
   ConversationRepository,
   MessageRepository,
-  InboundMessageOrchestrator,
+  InMemoryEventBus,
+  CustomerRepositoryAdapter,
+  ConversationRepositoryAdapter,
+  MessageRepositoryAdapter,
 } from '@wacore/infrastructure';
+import { InboundMessageHandler } from '@wacore/commerce-core';
+import { EventNames } from '@wacore/shared';
 
 let _orchestrator: ConnectionOrchestrator | null = null;
 
-export function getOrchestrator(): ConnectionOrchestrator {
+export async function getOrchestrator(): Promise<ConnectionOrchestrator> {
   if (_orchestrator) return _orchestrator;
 
   const logger = new ConsoleLogger({ level: 'info', context: { service: 'dashboard' } });
@@ -23,13 +28,21 @@ export function getOrchestrator(): ConnectionOrchestrator {
   const conversationRepo = new ConversationRepository(db);
   const messageRepo = new MessageRepository(db);
 
-  const messageOrchestrator = new InboundMessageOrchestrator(
+  const eventBus = new InMemoryEventBus();
+  await eventBus.start();
+
+  const customerAdapter = new CustomerRepositoryAdapter(customerRepo);
+  const conversationAdapter = new ConversationRepositoryAdapter(conversationRepo);
+  const messageAdapter = new MessageRepositoryAdapter(messageRepo);
+
+  const inboundHandler = new InboundMessageHandler({
     logger,
-    customerRepo,
-    conversationRepo,
-    messageRepo,
-    instanceRepo,
-  );
+    customerRepo: customerAdapter,
+    conversationRepo: conversationAdapter,
+    messageRepo: messageAdapter,
+  });
+
+  eventBus.subscribe(EventNames.MESSAGE_RECEIVED, inboundHandler.handleIncomingMessage.bind(inboundHandler));
 
   _orchestrator = new ConnectionOrchestrator(
     logger,
@@ -40,7 +53,7 @@ export function getOrchestrator(): ConnectionOrchestrator {
     },
     instanceRepo,
     sessionRepo,
-    messageOrchestrator,
+    eventBus,
   );
 
   return _orchestrator;

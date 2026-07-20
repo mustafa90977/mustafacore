@@ -11,3 +11,4 @@ export * from './session';
 export * from './connection';
 export * from './qr';
 export * from './messaging';
+export * from './adapters';

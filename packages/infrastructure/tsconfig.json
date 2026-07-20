@@ -7,9 +7,10 @@
     "paths": {
       "@wacore/shared": ["../shared/src"],
       "@wacore/wa-core": ["../wa-core/src"],
+      "@wacore/commerce-core": ["../commerce-core/src"],
       "@prisma/client": ["../../node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3/node_modules/@prisma/client"]
     }
   },
-  "include": ["src/**/*.ts", "../shared/src/**/*.ts", "../wa-core/src/**/*.ts"],
+  "include": ["src/**/*.ts", "../shared/src/**/*.ts", "../wa-core/src/**/*.ts", "../commerce-core/src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,1 +1,1 @@
-export { IMessageSender, INotificationSender } from './i-message-sender';
+export type { IMessageSender, INotificationSender } from './i-message-sender';

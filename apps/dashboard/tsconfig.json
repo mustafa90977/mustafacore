@@ -1,8 +1,6 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
     "jsx": "preserve",
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -14,27 +12,36 @@
     "noEmit": true,
     "incremental": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@wacore/shared": ["../../packages/shared/src"],
-      "@wacore/wa-core": ["../../packages/wa-core/src"],
-      "@wacore/commerce-core": ["../../packages/commerce-core/src"],
-      "@wacore/infrastructure": ["../../packages/infrastructure/src"]
-    }
+      "@/*": [
+        "./src/*"
+      ],
+      "@wacore/shared": [
+        "../../packages/shared/src"
+      ],
+      "@wacore/wa-core": [
+        "../../packages/wa-core/src"
+      ],
+      "@wacore/commerce-core": [
+        "../../packages/commerce-core/src"
+      ],
+      "@wacore/infrastructure": [
+        "../../packages/infrastructure/src"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "next-env.d.ts"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    {
-      "path": "../../packages/shared"
-    },
-    {
-      "path": "../../packages/wa-core"
-    },
-    {
-      "path": "../../packages/commerce-core"
-    },
-    {
-      "path": "../../packages/infrastructure"
-    }
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }

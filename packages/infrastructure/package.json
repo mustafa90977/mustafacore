@@ -24,6 +24,7 @@
     "@hapi/boom": "^10.0.1",
     "@prisma/client": "^6.19.3",
     "@supabase/supabase-js": "^2.110.7",
+    "@wacore/commerce-core": "workspace:*",
     "@wacore/shared": "workspace:*",
     "@wacore/wa-core": "workspace:*",
     "@whiskeysockets/baileys": "7.0.0-rc13",

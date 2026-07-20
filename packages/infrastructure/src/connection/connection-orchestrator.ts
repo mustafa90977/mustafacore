@@ -1,11 +1,10 @@
-import { UniqueId, ILogger } from '@wacore/shared';
-import { ConnectionStatus, IncomingMessage } from '@wacore/wa-core';
+import { UniqueId, ILogger, IEventBus, generateId } from '@wacore/shared';
+import { ConnectionStatus, IncomingMessage, createMessageReceivedEvent } from '@wacore/wa-core';
 import { InstanceStatus, SessionStatus } from '@prisma/client';
 import { BaileysProvider } from '../baileys/baileys-provider';
 import { SessionManager, SessionManagerConfig } from '../session/session-manager';
 import { IInstanceRepository } from '../repositories/instance.repository';
 import { ISessionRepository } from '../repositories/session.repository';
-import { InboundMessageOrchestrator } from '../messaging/inbound-message-orchestrator';
 
 export interface ConnectionOrchestratorConfig {
   sessionConfig: SessionManagerConfig;
@@ -16,7 +15,7 @@ export class ConnectionOrchestrator {
   private readonly _sessionManager: SessionManager;
   private readonly _instanceRepo: IInstanceRepository;
   private readonly _sessionRepo: ISessionRepository;
-  private readonly _messageOrchestrator: InboundMessageOrchestrator;
+  private readonly _eventBus: IEventBus;
   private readonly _providers: Map<UniqueId, BaileysProvider> = new Map();
 
   constructor(
@@ -24,13 +23,13 @@ export class ConnectionOrchestrator {
     config: ConnectionOrchestratorConfig,
     instanceRepo: IInstanceRepository,
     sessionRepo: ISessionRepository,
-    messageOrchestrator: InboundMessageOrchestrator,
+    eventBus: IEventBus,
   ) {
     this._logger = logger.child({ module: 'ConnectionOrchestrator' });
     this._sessionManager = new SessionManager(logger, config.sessionConfig);
     this._instanceRepo = instanceRepo;
     this._sessionRepo = sessionRepo;
-    this._messageOrchestrator = messageOrchestrator;
+    this._eventBus = eventBus;
   }
 
   async startConnection(instanceId: UniqueId): Promise<{ success: boolean; status: string }> {
@@ -104,9 +103,9 @@ export class ConnectionOrchestrator {
 
     provider.on('message_received', async (data: { instanceId: string; message: IncomingMessage }) => {
       try {
-        await this._messageOrchestrator.handleIncomingMessage(data.message);
+        await this.publishMessageReceived(instance, data.message);
       } catch (error) {
-        this._logger.error('Failed to process incoming message', error as Error, { instanceId });
+        this._logger.error('Failed to publish message received event', error as Error, { instanceId });
       }
     });
 
@@ -164,5 +163,35 @@ export class ConnectionOrchestrator {
 
   getSessionManager(): SessionManager {
     return this._sessionManager;
+  }
+
+  private async publishMessageReceived(
+    instance: any,
+    message: IncomingMessage,
+  ): Promise<void> {
+    const event = createMessageReceivedEvent(message.externalId, {
+      messageId: generateId(),
+      instanceId: message.instanceId,
+      externalId: message.externalId,
+      from: message.from,
+      to: message.to,
+      type: message.type,
+      content: message.content,
+      timestamp: message.timestamp,
+    });
+
+    event.workspaceId = instance.workspaceId;
+    event.payload = {
+      ...event.payload,
+      storeId: instance.storeId,
+      pushName: (message.content as Record<string, unknown>)?.pushName,
+    };
+
+    await this._eventBus.publish(event);
+
+    this._logger.debug('MESSAGE_RECEIVED event published to EventBus', {
+      instanceId: message.instanceId,
+      externalId: message.externalId,
+    });
   }
 }

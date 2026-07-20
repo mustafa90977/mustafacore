@@ -113,6 +113,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.110.7
         version: 2.110.7
+      '@wacore/commerce-core':
+        specifier: workspace:*
+        version: link:../commerce-core
       '@wacore/shared':
         specifier: workspace:*
         version: link:../shared

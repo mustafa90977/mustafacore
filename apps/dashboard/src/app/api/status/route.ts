@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'instanceId is required' }, { status: 400 });
     }
 
-    const orchestrator = getOrchestrator();
+    const orchestrator = await getOrchestrator();
     const status = await orchestrator.getStatus(instanceId);
 
     return NextResponse.json(status);

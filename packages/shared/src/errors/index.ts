@@ -1,6 +1,7 @@
 export { BaseError } from './base.error';
 export { DomainError } from './domain.error';
-export { ValidationError, ValidationErrorDetail } from './validation.error';
+export { ValidationError } from './validation.error';
+export type { ValidationErrorDetail } from './validation.error';
 export { NotFoundError } from './not-found.error';
 export { AuthenticationError } from './authentication.error';
 export { AuthorizationError } from './authorization.error';

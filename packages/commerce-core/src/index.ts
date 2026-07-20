@@ -4,3 +4,4 @@ export * from './domain/events';
 export * from './domain/value-objects';
 export * from './infrastructure/repositories';
 export * from './ports';
+export * from './application/handlers';

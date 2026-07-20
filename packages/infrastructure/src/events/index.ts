@@ -1,40 +1,29 @@
+export type { EventEnvelope } from './event-envelope';
 export {
-  EventEnvelope,
   createEventEnvelopeFromDomain,
   createEventEnvelopeFromIntegration,
   createEventEnvelope,
 } from './event-envelope';
 
-export {
-  IEventSerializer,
-  EventSerializer,
-  SerializedEvent,
-} from './event-serializer';
+export { EventSerializer } from './event-serializer';
+export type { IEventSerializer, SerializedEvent } from './event-serializer';
 
-export {
-  EventRegistry,
-  EventRegistration,
-  EventVersionInfo,
-} from './event-registry';
+export { EventRegistry } from './event-registry';
+export type { EventRegistration, EventVersionInfo } from './event-registry';
 
-export {
+export type {
   EventHandlerConfig,
-  DEFAULT_HANDLER_CONFIG,
   RetryPolicy,
   IDeadLetterHandler,
   EnvelopeEventHandler,
   EventBusMiddleware,
   EventBusInterceptor,
   HandlerRegistration,
-  createHandlerConfig,
 } from './event-handlers';
+export { DEFAULT_HANDLER_CONFIG, createHandlerConfig } from './event-handlers';
 
-export {
-  InMemoryEventBus,
-  InMemoryEventBusOptions,
-} from './in-memory-event-bus';
+export { InMemoryEventBus } from './in-memory-event-bus';
+export type { InMemoryEventBusOptions } from './in-memory-event-bus';
 
-export {
-  EventDispatcher,
-  EventDispatcherOptions,
-} from './event-dispatcher';
+export { EventDispatcher } from './event-dispatcher';
+export type { EventDispatcherOptions } from './event-dispatcher';

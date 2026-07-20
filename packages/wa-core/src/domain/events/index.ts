@@ -1,18 +1,22 @@
-export {
+export type {
   InstanceCreatedPayload,
   InstanceConnectedPayload,
   InstanceDisconnectedPayload,
+} from './instance-events';
+export {
   createInstanceCreatedEvent,
   createInstanceConnectedEvent,
   createInstanceDisconnectedEvent,
 } from './instance-events';
 
-export {
+export type {
   MessageReceivedPayload,
   MessageSentPayload,
   MessageDeliveredPayload,
   MessageReadPayload,
   MessageFailedPayload,
+} from './message-events';
+export {
   createMessageReceivedEvent,
   createMessageSentEvent,
   createMessageDeliveredEvent,
@@ -20,21 +24,25 @@ export {
   createMessageFailedEvent,
 } from './message-events';
 
-export {
+export type {
   SessionCreatedPayload,
   SessionActivatedPayload,
   SessionExpiredPayload,
   SessionRevokedPayload,
+} from './session-events';
+export {
   createSessionCreatedEvent,
   createSessionActivatedEvent,
   createSessionExpiredEvent,
   createSessionRevokedEvent,
 } from './session-events';
 
-export {
+export type {
   QRGeneratedPayload,
   QRScannedPayload,
   QRExpiredPayload,
+} from './qr-events';
+export {
   createQRGeneratedEvent,
   createQRScannedEvent,
   createQRExpiredEvent,

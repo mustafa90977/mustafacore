@@ -1,12 +1,12 @@
-export { BaileysConfig, DEFAULT_BAILEYS_CONFIG } from './baileys-config';
+export { DEFAULT_BAILEYS_CONFIG } from './baileys-config';
+export type { BaileysConfig } from './baileys-config';
 export { BaileysLoggerAdapter } from './baileys-logger-adapter';
-export { BaileysErrorMapper, BaileysErrorInfo, BaileysErrorCategory } from './baileys-error-mapper';
-export {
-  BaileysEventMapper,
-  BaileysEventMapperOptions,
-  NormalizedConnectionEvent,
-  NormalizedMessageEvent,
-} from './baileys-event-mapper';
+export { BaileysErrorMapper } from './baileys-error-mapper';
+export type { BaileysErrorInfo, BaileysErrorCategory } from './baileys-error-mapper';
+export { BaileysEventMapper } from './baileys-event-mapper';
+export type { BaileysEventMapperOptions, NormalizedConnectionEvent, NormalizedMessageEvent } from './baileys-event-mapper';
 export { BaileysMessageMapper } from './baileys-message-mapper';
-export { BaileysSocketFactory, SocketInstance, SocketCallbacks } from './baileys-socket-factory';
-export { BaileysProvider, BaileysProviderOptions } from './baileys-provider';
+export { BaileysSocketFactory } from './baileys-socket-factory';
+export type { SocketInstance, SocketCallbacks } from './baileys-socket-factory';
+export { BaileysProvider } from './baileys-provider';
+export type { BaileysProviderOptions } from './baileys-provider';

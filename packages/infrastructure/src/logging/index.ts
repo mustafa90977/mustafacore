@@ -1,5 +1,6 @@
 export { ConsoleLogger } from './console-logger';
-export { StructuredLogger, StructuredLogEntry } from './structured-logger';
+export { StructuredLogger } from './structured-logger';
+export type { StructuredLogEntry } from './structured-logger';
 export {
   getCorrelationId,
   setCorrelationId,
@@ -7,6 +8,8 @@ export {
   generateCorrelationId,
   getOrCreateCorrelationId,
 } from './correlation-id';
-export { RequestLogger, RequestLogContext } from './request-logger';
+export { RequestLogger } from './request-logger';
+export type { RequestLogContext } from './request-logger';
 export { ErrorLogger } from './error-logger';
-export { PerformanceLogger, PerformanceMetric } from './performance-logger';
+export { PerformanceLogger } from './performance-logger';
+export type { PerformanceMetric } from './performance-logger';

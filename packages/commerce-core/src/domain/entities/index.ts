@@ -1,6 +1,12 @@
-export { Store, StoreProps } from './store';
-export { Customer, CustomerProps } from './customer';
-export { Product, ProductProps, ProductMedia } from './product';
-export { Conversation, ConversationProps } from './conversation';
-export { Order, OrderProps } from './order';
-export { OrderItem, OrderItemProps } from './order-item';
+export { Store } from './store';
+export type { StoreProps } from './store';
+export { Customer } from './customer';
+export type { CustomerProps } from './customer';
+export { Product } from './product';
+export type { ProductProps, ProductMedia } from './product';
+export { Conversation } from './conversation';
+export type { ConversationProps } from './conversation';
+export { Order } from './order';
+export type { OrderProps } from './order';
+export { OrderItem } from './order-item';
+export type { OrderItemProps } from './order-item';
